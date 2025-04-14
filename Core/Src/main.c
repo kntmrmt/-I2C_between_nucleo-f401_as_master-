@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define I2C1_SLAVE_ADDRESS 40 // 0d20 << 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,6 +72,10 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+  HAL_StatusTypeDef i2c1_hal_status = HAL_ERROR;
+  uint8_t i2c_hal_status_message_success[] = "[I2C master] Success\r\n";
+  uint8_t i2c_hal_status_message_fail[] = "[I2C master] Fail\r\n";
+  uint8_t i2c1_transmit_message[] = "[I2C DATA] Hi, This is Master\r\n";
 
   /* USER CODE END 1 */
 
@@ -97,7 +101,25 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(1000);
 
+  //Sending in Blocking mode
+  i2c1_hal_status = HAL_I2C_Master_Transmit(&hi2c1, I2C1_SLAVE_ADDRESS, i2c1_transmit_message, sizeof(i2c1_transmit_message), HAL_MAX_DELAY);
+  
+  //Sending in Interrupt mode
+  // i2c1_hal_status = HAL_I2C_Master_Transmit_IT(&hi2c1, I2C1_SLAVE_ADDRESS, i2c1_transmit_message, sizeof(i2c1_transmit_message));
+  
+  //Sending in DMA mode
+  // i2c1_hal_status = HAL_I2C_Master_Transmit_DMA(&hi2c1, I2C1_SLAVE_ADDRESS, i2c1_transmit_message, sizeof(i2c1_transmit_message));
+
+  if (i2c1_hal_status == HAL_OK)
+  {
+    HAL_UART_Transmit(&huart2, i2c_hal_status_message_success, sizeof(i2c_hal_status_message_success), 10);// Sending in normal mode
+  }
+  else
+  {
+    HAL_UART_Transmit(&huart2, i2c_hal_status_message_fail, sizeof(i2c_hal_status_message_fail), 10);// Sending in normal mode
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
